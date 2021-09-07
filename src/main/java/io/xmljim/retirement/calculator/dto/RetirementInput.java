@@ -16,6 +16,7 @@ public class RetirementInput implements Serializable {
     private double selfContributionPct;
     private double employerContributionPct;
     private double investmentStyle;
+    private String contributionFrequency;
     private double postRetirementInterestRate;
     private String distributionFrequency;
     private int retirementDuration;

@@ -38,9 +38,11 @@ public class RetirementServiceImpl implements RetirementService {
     @Override
     public RetirementContributionModel getContributionModel(final RetirementInput input) {
         double weightedGrowth = getWeightedGrowthRate(input.getInvestmentStyle()).compute().asDouble();
-
+        PaymentFrequency contributionFreqency = input.getContributionFrequency() != null ?
+                PaymentFrequency.valueOf(input.getContributionFrequency().toUpperCase()) : PaymentFrequency.SEMI_MONTHLY;
         return algorithmClient.getFinancial().retirementContributionModel(input.getAge(), input.getRetirementAge(), input.getCurrentSalary(),
-                input.getSelfContributionPct(), input.getEmployerContributionPct(), input.getCurrentRetirementBalance(), input.getColaPct(), weightedGrowth);
+                input.getSelfContributionPct(), input.getEmployerContributionPct(), input.getCurrentRetirementBalance(), input.getColaPct(), weightedGrowth,
+                contributionFreqency);
     }
 
     @Override
@@ -58,10 +60,13 @@ public class RetirementServiceImpl implements RetirementService {
     public RetirementModel getRetirementModel(final RetirementInput input) {
         double weightedGrowth = getWeightedGrowthRate(input.getInvestmentStyle()).compute().asDouble();
         double inflationRate = cpiService.getAverageInflation(20);
-        PaymentFrequency distributionFrequency =  PaymentFrequency.MONTHLY;//PaymentFrequency.valueOf(input.getDistributionFrequency().toUpperCase());
+        PaymentFrequency distributionFrequency = input.getDistributionFrequency() != null ?
+                PaymentFrequency.valueOf(input.getDistributionFrequency().toUpperCase()) : PaymentFrequency.MONTHLY;
+        PaymentFrequency contributionFreqency = input.getContributionFrequency() != null ?
+                PaymentFrequency.valueOf(input.getContributionFrequency().toUpperCase()) : PaymentFrequency.SEMI_MONTHLY;
 
         return algorithmClient.getFinancial().retirementModel(input.getAge(), input.getRetirementAge(), input.getCurrentSalary(), input.getCurrentRetirementBalance(),
-                input.getSelfContributionPct(), input.getEmployerContributionPct(), input.getColaPct(), weightedGrowth, input.getPostRetirementInterestRate(),
+                input.getSelfContributionPct(), input.getEmployerContributionPct(), input.getColaPct(), weightedGrowth, contributionFreqency, input.getPostRetirementInterestRate(),
                 distributionFrequency, inflationRate, input.getRetirementDuration(), input.getIncomeReplacementPct());
 
     }
